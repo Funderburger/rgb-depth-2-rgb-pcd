@@ -1,37 +1,5 @@
 function create_RGBD_PCD(scan_filename_colorizer, image_filename_colorizer, Kc, R, t)
 
-% load the camera calibration parameters
-%load calibrated_model.mat;
-
-% %%% Optional: Make sure that project_points2 function from MCCT is in your
-% %%% path
-% s=which('project_points2');
-% if(isempty(s))
-%     disp(['You need to place the Matlab Camera Calibration Toolbox ' ...
-%         'directory in your path to perform this procedure.']);
-%     return;
-% end
-% 
-% % Input name of scan file and image file
-% scan_filename_colorizer=input('Enter xyz scan filename to colorize: ','s');
-% temp=dir(scan_filename_colorizer);
-% if(~size(temp,1))
-%     disp(['Cannot find file named ' scan_filename_colorizer '. Please check and try again.']);
-%     return;
-% end
-% selectedImageFlag=0;
-% while (~selectedImageFlag)
-%     image_filename_colorizer=...
-%         input('Enter image filename to use for colorizing points: ','s');
-%     temp=dir(image_filename_colorizer);
-%     if(~size(temp,1))
-%         disp(['Cannot find file named' image_filename_colorizer ...
-%                 '. Please check and try again.']);
-%     else
-%         selectedImageFlag=1;
-%     end
-% end
-
 tic
 % load scan
 scan3d=load(scan_filename_colorizer);

@@ -51,3 +51,18 @@ t = cameraPicoParams.TranslationOfCamera2;
 % t = [47.1934, 0.0297999, -1.67577];
 create_RGBD_PCD('pico_pcd3.txt','rgb_pico_3.png',Kc,R,t')
 % create_RGBD_PCD('pico_pcd_1.txt','/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/var345/res-test3_rgb.png',Kc,R,t')
+
+%  Add this at the beginning of the generated '.pcd' file in order to be
+%  able to visualize the point cloud using pcl_viewer
+% Without % and change the number of point if needed (230400)
+% # .PCD v.7 - Point Cloud Data file format
+% VERSION .7
+% FIELDS x y z rgb
+% SIZE 4 4 4 4
+% TYPE F F F F
+% COUNT 1 1 1 1
+% WIDTH 230400
+% HEIGHT 1
+% VIEWPOINT 0 0 0 1 0 0 0
+% POINTS 230400
+% DATA ascii
