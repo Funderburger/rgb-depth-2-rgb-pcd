@@ -1,28 +1,31 @@
 import numpy as np
 import cv2
-import torch 
+import torch  
 import open3d as o3d
 
 # depth_img = "/home/funderburger/work_ws/calibration_ws/planes_extr_ws/training_data/depth_data/0004_depth.png"
-depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/depth_pico_3.png"
-# depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/var345/test3_depth.png"
+# depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/depth_pico_3.png"
+# depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/rgb-depth2/test1_depth.png"
+# depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/cam_P0018_v3/capturi/test/depth_p0018_0.png"
+# depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/p0018_mod/depth_p0018_0.png"
+depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/stereo_test/2_calib_v3/res-rgb_p0018_7.png"
 # pcd_depth = "/home/funderburger/work_ws/calibration_ws/planes_extr_ws/training_data/pcd_data/0004_pcd.pcd"
 
 # max_depth = 7000
 depth_np = cv2.imread(depth_img,-1)
-depth_np = cv2.resize(depth_np,(640,360))
+depth_np = cv2.resize(depth_np[:,:,0],(640,480))
 depth_np = np.array(depth_np,np.float32,copy=True)[:, :, None].transpose((2,0,1))
 depth = torch.from_numpy(depth_np).long()#/max_depth
 depth = depth.to('cuda')
 
 eps = 1e-7
 
-# depth[depth==0] = eps
+# pico depth[depth==0] = eps
 
-cx = 334.081
-cy = 169.808
-fx = 460.585
-fy = 460.268
+# cx = 334.081
+# cy = 169.808
+# fx = 460.585
+# fy = 460.268
 
 # # # from matlab
 # cx = 332.308128574715
@@ -45,6 +48,19 @@ fy = 460.268
 # cy = 228.6992
 # fx = 377.22
 # fy = 377.111
+
+# # aditof camera P0018 
+cx = 320.794
+cy = 227.692
+fx = 375.351
+fy = 375.148
+
+# aditof camera RGB P0018
+cx = 319.402257949515
+cy = 241.417780839017
+fx = 317.951291689649
+fy = 428.580324216062
+
 
 rows, cols = depth[0].shape
 c, _ = torch.meshgrid(torch.arange(cols), torch.arange(cols))
@@ -74,16 +90,17 @@ pcd_from_img_np = pcd_from_img.cpu().detach().numpy()
 # intrinsics = o3d.cpu.pybind.camera.PinholeCameraIntrinsic(640,360,fx,fy,cx,cy) 
 # pcd = o3d.geometry.PointCloud.create_from_depth_image(open3d_img,intrinsic=intrinsics)
 
-pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/pico_pcd3.txt","w")
+# pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/p0018_v4_cam_pcd.txt","w")
+pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/stereo_test/2_calib_v3/pcd_rgb_p0018_7.pcd","w")
 # for row in pcd_from_img_np:
 #     np.savetxt(pcd_file,row)
 # pcd_file.close()
 np.savetxt(pcd_file, pcd_from_img_np, delimiter=" ")
 
-man_pcd = o3d.geometry.PointCloud()
-man_pcd.points = o3d.utility.Vector3dVector(pcd_from_img_np)#*max_depth)
-o3d.visualization.draw_geometries([man_pcd])
-o3d.io.write_point_cloud("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/pcd_1.pcd",man_pcd,write_ascii=True)
+# man_pcd = o3d.geometry.PointCloud()
+# man_pcd.points = o3d.utility.Vector3dVector(pcd_from_img_np)#*max_depth)
+# o3d.visualization.draw_geometries([man_pcd])
+# o3d.io.write_point_cloud("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/pcd_1.pcd",man_pcd,write_ascii=True)
 
 
 print()

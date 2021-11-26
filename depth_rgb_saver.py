@@ -12,21 +12,49 @@ import message_filters
 import std_msgs.msg
 
 # ir_pub = None
-# depth_pub = None
+# depth_pub = None 
 
 bridge = CvBridge()
+
+def special_scale_RGB(image):
+    rgb_image = np.float64(np.copy(image))
+    minVal = rgb_image.min()
+    maxVal = rgb_image.max()
+    minAvg = 0
+    maxAvg = 512
+    minAvg = minAvg * 0.9 + minVal * 0.1
+    maxAvg = maxAvg * 0.9 + maxVal * 0.1
+    rgb_image -= minAvg / 2
+    rgb_image *= 65535 / (maxAvg - minAvg / 2)
+    avg = cv2.mean(rgb_image)
+    rgb_image *= 32768.0 / avg[0]
+    return np.uint16(rgb_image)
+    
+    
 
 def callback_sync(rgb_msg, depth_msg):
     # global ir_pub
     # global depth_pub
-    folder = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/"
+    global nr
+
+    folder = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/cam_P0018_v3/capturi/"
 
     depth = bridge.imgmsg_to_cv2(depth_msg,desired_encoding="passthrough")
-    rgb = bridge.imgmsg_to_cv2(rgb_msg,desired_encoding="passthrough")
-    cv2.imwrite(folder+"depth_pico_5.png", depth)
-    cv2.imwrite(folder+"rgb_pico_5.png", rgb)
+
+
+    rgb_not = bridge.imgmsg_to_cv2(rgb_msg,desired_encoding="passthrough") #BAYER_BGGR16    
+
+    # rgb = special_scale_RGB(rgb_not)
+
+    rgb = cv2.cvtColor(rgb_not, cv2.COLOR_BayerBG2RGB)
+    # rgb = np.frombuffer(rgb_msg.data,np.uint16).reshape(rgb_msg.height,rgb_msg.width,1)
+    # cv2.imwrite(folder+"ir/" +"ir_p0018_"+ str(nr) + ".png", depth)
+    cv2.imwrite(folder+"test/" +"depth_p0018_"+ str(nr) + ".png", depth)
+    cv2.imwrite(folder+"test/" +"rgb_p0018_"+ str(nr) + ".png", rgb)
+    # cv2.imwrite(folder+"rgb/" + "rgb_p0018_"+ str(nr) + ".png", rgb)
 
     cv2.waitKey(1)
+    nr += 1
     # height = frame.shape[0]
     # width = frame.shape[1]
     # rgba_img = np.zeros((height,width,4), np.uint8)
@@ -52,17 +80,19 @@ def callback_sync(rgb_msg, depth_msg):
 def start_node():
     global depth_pub
     global ir_pub
+    global nr
 
-    rospy.init_node('depth_rgb_saver')
+    rospy.init_node('ir_rgb_saver')
     rospy.loginfo('Save 2 frames: rgb and IR')
-
+    nr =0
     # ir_pub = rospy.Publisher('/pico_IR_sync', Image, queue_size=1)
     # depth_pub = rospy.Publisher('/pico_rgba8_depth_sync', Image, queue_size=1)
     
-    rgb_sub = message_filters.Subscriber("/pico_zense/colour/image_raw", Image)
-    depth_sub = message_filters.Subscriber("/pico_zense/depth/image_raw", Image)
+    rgb_sub = message_filters.Subscriber("/aditof_roscpp/aditof_rgb", Image)
+    
+    ir_sub = message_filters.Subscriber("/aditof_roscpp/aditof_depth", Image)
 
-    ts = message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 0.2, allow_headerless=False)
+    ts = message_filters.ApproximateTimeSynchronizer([rgb_sub, ir_sub], 1, 0.1, allow_headerless=False)
     ts.registerCallback(callback_sync)
     
 
