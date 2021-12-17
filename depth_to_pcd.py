@@ -8,12 +8,12 @@ import open3d as o3d
 # depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/rgb-depth2/test1_depth.png"
 # depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/cam_P0018_v3/capturi/test/depth_p0018_0.png"
 # depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/p0018_mod/depth_p0018_0.png"
-depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/stereo_test/2_calib_v3/res-rgb_p0018_7.png"
+depth_img = "/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/cam_P0025/test/depth_p0025_0.png"
 # pcd_depth = "/home/funderburger/work_ws/calibration_ws/planes_extr_ws/training_data/pcd_data/0004_pcd.pcd"
 
 # max_depth = 7000
 depth_np = cv2.imread(depth_img,-1)
-depth_np = cv2.resize(depth_np[:,:,0],(640,480))
+depth_np = cv2.resize(depth_np,(640,480))
 depth_np = np.array(depth_np,np.float32,copy=True)[:, :, None].transpose((2,0,1))
 depth = torch.from_numpy(depth_np).long()#/max_depth
 depth = depth.to('cuda')
@@ -50,17 +50,46 @@ eps = 1e-7
 # fy = 377.111
 
 # # aditof camera P0018 
-cx = 320.794
-cy = 227.692
-fx = 375.351
-fy = 375.148
+# cx = 320.794
+# cy = 227.692
+# fx = 375.351
+# fy = 375.148
 
-# aditof camera RGB P0018
-cx = 319.402257949515
-cy = 241.417780839017
-fx = 317.951291689649
-fy = 428.580324216062
+# from Matlab
+# cx = 322.836239427122
+# cy = 232.894498885669
+# fx = 386.434524084762
+# fy = 390.029763210794
 
+# aditof camera P0025
+# cx = 325.355
+# cy = 232.893
+# fx = 374.021
+# fy = 373.983
+
+# # matlab params
+# cx = 332.959687888134
+# cy = 234.448508134816
+# fx = 380.284683581391
+# fy = 381.411751914243
+
+# matlab params after resize
+cx = 334.105687829091
+cy = 235.365076228726
+fx = 372.501588029026
+fy = 373.362869147599
+
+
+# aditof camera P0003
+# cx = 314.297
+# cy = 223.682
+# fx = 372.803
+# fy = 372.743
+
+# cx = 328.777562310231
+# cy = 176.832172621824
+# fx = 479.111498692363
+# fy = 460.426771443952
 
 rows, cols = depth[0].shape
 c, _ = torch.meshgrid(torch.arange(cols), torch.arange(cols))
@@ -90,8 +119,8 @@ pcd_from_img_np = pcd_from_img.cpu().detach().numpy()
 # intrinsics = o3d.cpu.pybind.camera.PinholeCameraIntrinsic(640,360,fx,fy,cx,cy) 
 # pcd = o3d.geometry.PointCloud.create_from_depth_image(open3d_img,intrinsic=intrinsics)
 
-# pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/p0018_v4_cam_pcd.txt","w")
-pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/stereo_test/2_calib_v3/pcd_rgb_p0018_7.pcd","w")
+pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/pico/rgb_pcd/p0025_cam_pcd.txt","w")
+# pcd_file = open("/home/funderburger/work_ws/calibration_ws/camera_cross_calib_ws/new_dataset/p0018_and_pico/test/stereo_test/2_calib_v3/pcd_rgb_p0018_7.pcd","w")
 # for row in pcd_from_img_np:
 #     np.savetxt(pcd_file,row)
 # pcd_file.close()
